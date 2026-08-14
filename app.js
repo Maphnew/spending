@@ -45,9 +45,14 @@ const RE_LINE_HEADER = /^[^\n]{0,20}?(?:카드|은행|페이)[^\n]{0,12}?(?:승�
 const RE_AMOUNT = /([\d,]+)\s*원/;
 const RE_DATE   = /(?:(\d{4})[./-])?(\d{1,2})[./](\d{1,2})(?:[\s(]+(\d{1,2}):(\d{2}))?/;
 const RE_RUNNING_TOTAL = /(누적|잔액|한도|사용가능|이용가능|승인가능)\s*[\d,]+\s*원?/g;
+const RE_RUNNING_VALUE = /(?:누적|잔액)\s*([\d,]+)\s*원?/;   // 같은 분·같은 금액 결제를 가르는 유일한 단서
 const RE_MASKED_NAME = /[가-힣A-Za-z]\*+[가-힣A-Za-z]*(님)?/g;
 const RE_INSTALLMENT = /\(\s*(일시불|\d+\s*개월)\s*\)|(?:^|\s)(일시불|\d+\s*개월)(?=\s|$)/g;
 const RE_BOILERPLATE = /(정상\s*승인\s*(되었습니다)?[.!]?|승인\s*되었습니다[.!]?|되었습니다[.!]?|자동이체된?\s*금액)/g;
+
+let idSeq = 0;
+/** 내역을 지목하기 위한 식별자. 중복 판정에는 쓰지 않는다(→ isSameTx). */
+const newId = () => `${Date.now().toString(36)}-${(idSeq++).toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
 /** 붙여넣은 텍스트를 문자 한 건씩의 블록으로 나눈다. */
 function splitBlocks(text) {
@@ -95,7 +100,9 @@ function pickMerchant(segments) {
 function parseBlock(block) {
   let text = block.join('\n');
 
-  // 누적/잔액은 결제액이 아니므로 먼저 걷어낸다
+  // 누적/잔액은 결제액이 아니므로 값만 챙겨두고 걷어낸다
+  const runningMatch = text.match(RE_RUNNING_VALUE);
+  const running = runningMatch ? Number(runningMatch[1].replace(/,/g, '')) : null;
   text = text.replace(RE_RUNNING_TOTAL, ' ');
 
   let card = '';
@@ -134,11 +141,12 @@ function parseBlock(block) {
   const merchant = pickMerchant(segments) || '(가맹점 미상)';
 
   return {
-    id: `${at === null ? 'nodate' : at}-${amount}-${merchant}`,
+    id: newId(),
     at,
     amount: canceled ? -amount : amount,
     merchant,
     card,
+    running: Number.isFinite(running) ? running : null,
     category: categorize(merchant),
     canceled,
   };
@@ -176,6 +184,16 @@ function categorize(merchant) {
    ──────────────────────────────────────────── */
 const STORAGE_KEY = 'spending-app/v1';
 
+/** 같은 결제인가?
+    일시·금액·가맹점이 모두 같아야 하고, 양쪽 다 누적 금액을 알고 있다면 그것까지 같아야 한다.
+    (같은 분에 같은 금액을 두 번 결제해도 누적은 다르므로 별개로 남는다.
+     누적을 모르는 예전 데이터와 비교할 때는 일시·금액·가맹점만 본다.) */
+function isSameTx(a, b) {
+  if (a.merchant !== b.merchant || a.amount !== b.amount || a.at !== b.at) return false;
+  if (a.running != null && b.running != null) return a.running === b.running;
+  return true;
+}
+
 const store = {
   transactions: [],
   learned: {},   // 가맹점명 → 사용자가 직접 고른 분류
@@ -203,15 +221,14 @@ const store = {
     }
   },
 
-  /** 같은 일시·금액·가맹점이면 중복으로 보고 건너뛴다. */
+  /** 문자에서 읽은 건은 이미 담긴 것과 겹치면 건너뛴다(→ isSameTx).
+      직접 입력은 사용자가 의도한 것이므로 겹쳐도 그대로 담는다. */
   add(list) {
-    const seen = new Set(this.transactions.map((t) => t.id));
-    let added = 0;
+    const added = [];
     for (const tx of list) {
-      if (seen.has(tx.id)) continue;
-      seen.add(tx.id);
+      if (!tx.manual && this.transactions.some((t) => isSameTx(t, tx))) continue;
       this.transactions.push(tx);
-      added += 1;
+      added.push(tx);
     }
     this.sort();
     this.save();
@@ -679,9 +696,9 @@ function handleParse() {
   }
 
   const added = store.add(parsed);
-  const skipped = parsed.length - added;
-  const undated = parsed.filter((t) => t.at === null).length;
-  const parts = [`${added}건 추가`];
+  const skipped = parsed.length - added.length;
+  const undated = added.filter((t) => t.at === null).length;
+  const parts = [`${added.length}건 추가`];
   if (skipped) parts.push(`중복 ${skipped}건 제외`);
   if (undated) parts.push(`날짜 미정 ${undated}건 — 표에서 채워주세요`);
   if (failed.length) parts.push(`인식 실패 ${failed.length}건`);
@@ -707,11 +724,12 @@ function handleManualAdd(e) {
   const category = el.mCategory.value === 'auto' ? categorize(merchant) : el.mCategory.value;
 
   store.add([{
-    id: `manual-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    id: newId(),
     at: Number.isFinite(at) ? at : null,
     amount,
     merchant,
     card: el.mCard.value.trim() || '직접 입력',
+    running: null,
     category,
     canceled: amount < 0,
     manual: true,
