@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소비 정리</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <h1>소비 정리</h1>
+    <div class="topbar-actions">
+      <select id="card-filter" aria-label="카드 선택"></select>
+      <select id="month-filter" aria-label="기간 선택"></select>
+      <button id="export-csv" class="btn ghost" type="button">CSV 내보내기</button>
+      <button id="clear-all" class="btn ghost danger" type="button">전체 삭제</button>
+    </div>
+  </header>
+
+  <div class="inputs">
+    <section class="paste card">
+      <label for="sms-input">카드 승인 문자를 붙여넣으세요</label>
+      <textarea id="sms-input" rows="6" spellcheck="false"
+        placeholder="[Web발신]&#10;현대카드 M 승인&#10;김*찬&#10;26,300원 일시불&#10;08/09 11:11&#10;쿠팡&#10;누적937,225원"></textarea>
+      <div class="paste-actions">
+        <button id="parse-btn" class="btn primary" type="button">정리하기</button>
+        <span id="parse-status" class="status" role="status" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>직접 입력</h2>
+      <form id="manual-form" class="manual-form">
+        <div class="field">
+          <label for="m-date">날짜</label>
+          <input type="date" id="m-date">
+        </div>
+        <div class="field">
+          <label for="m-time">시각</label>
+          <input type="time" id="m-time">
+        </div>
+        <div class="field grow">
+          <label for="m-merchant">가맹점</label>
+          <input type="text" id="m-merchant" placeholder="예: 동네카페" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="m-card">카드</label>
+          <input type="text" id="m-card" list="card-list" placeholder="직접 입력" autocomplete="off">
+          <datalist id="card-list"></datalist>
+        </div>
+        <div class="field">
+          <label for="m-amount">금액</label>
+          <input type="number" id="m-amount" placeholder="0" step="10" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="m-category">분류</label>
+          <select id="m-category"></select>
+        </div>
+        <div class="field manual-submit">
+          <button class="btn primary" type="submit">추가</button>
+        </div>
+      </form>
+      <p class="hint">환불·취소는 금액을 음수로 넣으세요. 시각을 비우면 00:00으로 들어갑니다.</p>
+      <span id="manual-status" class="status" role="status" aria-live="polite"></span>
+    </section>
+  </div>
+
+  <section id="empty-state" class="card empty" hidden>
+    <p>아직 정리된 내역이 없습니다. 위에 문자를 붙여넣고 <strong>정리하기</strong>를 눌러보세요.</p>
+  </section>
+
+  <div id="results" hidden>
+    <section class="kpis" aria-label="요약">
+      <div class="tile">
+        <span class="tile-label">총 지출</span>
+        <span class="tile-value hero" id="kpi-total">—</span>
+        <span class="tile-sub" id="kpi-range"></span>
+      </div>
+      <div class="tile">
+        <span class="tile-label">결제 건수</span>
+        <span class="tile-value" id="kpi-count">—</span>
+        <span class="tile-sub" id="kpi-avg"></span>
+      </div>
+      <div class="tile">
+        <span class="tile-label">하루 평균</span>
+        <span class="tile-value" id="kpi-daily">—</span>
+        <span class="tile-sub" id="kpi-days"></span>
+      </div>
+      <div class="tile">
+        <span class="tile-label">최다 지출 분류</span>
+        <span class="tile-value" id="kpi-top-cat">—</span>
+        <span class="tile-sub" id="kpi-top-cat-amt"></span>
+      </div>
+    </section>
+
+    <div class="charts">
+      <section class="card chart-card">
+        <h2>분류별 지출</h2>
+        <div id="chart-category" class="bars"></div>
+      </section>
+
+      <section class="card chart-card">
+        <h2>일별 지출</h2>
+        <div id="chart-daily" class="columns-wrap"></div>
+      </section>
+
+      <section class="card chart-card" id="chart-card-section">
+        <h2>카드별 지출</h2>
+        <div id="chart-card" class="bars"></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="table-head">
+        <h2>결제 내역 <span id="tx-count" class="muted"></span></h2>
+      </div>
+      <div class="table-scroll">
+        <table class="tx-table">
+          <thead>
+            <tr>
+              <th scope="col">일시</th>
+              <th scope="col">가맹점</th>
+              <th scope="col">카드</th>
+              <th scope="col">분류</th>
+              <th scope="col" class="num">금액</th>
+              <th scope="col"><span class="sr-only">삭제</span></th>
+            </tr>
+          </thead>
+          <tbody id="tx-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <div id="tooltip" class="tooltip" hidden></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
