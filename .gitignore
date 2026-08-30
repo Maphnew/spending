@@ -1,0 +1,5 @@
+node_modules/
+spending.db
+spending.db-journal
+spending.db-wal
+spending.db-shm

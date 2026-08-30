@@ -154,12 +154,8 @@ select:hover, .btn:hover { background: var(--hover-wash); }
 /* ── 입력 ────────────────────────────────── */
 .inputs {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 12px;
-}
-
-@media (max-width: 860px) {
-  .inputs { grid-template-columns: minmax(0, 1fr); }
 }
 
 .paste { display: flex; flex-direction: column; gap: 10px; }
@@ -234,6 +230,7 @@ textarea:focus-visible, select:focus-visible, .btn:focus-visible {
 .field input[type="time"] { width: 118px; }
 .field input[type="number"] { width: 104px; text-align: right; font-variant-numeric: tabular-nums; }
 .field select { width: 112px; }
+.field select#m-category { width: 168px; }
 .manual-submit { justify-content: flex-end; }
 
 .hint {
@@ -243,6 +240,109 @@ textarea:focus-visible, select:focus-visible, .btn:focus-visible {
 }
 
 #manual-status { display: block; margin-top: 6px; }
+
+/* ── 카드 설정 ───────────────────────────── */
+.card-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.card-form input {
+  flex: 1;
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--page);
+  color: var(--text-primary);
+  min-width: 0;
+}
+
+.card-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 4px 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--page);
+  font-size: 13px;
+}
+
+.chip-remove {
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 6px;
+}
+.chip-remove:hover { color: var(--critical); }
+
+.chip-empty {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── 모달 ────────────────────────────────── */
+dialog.modal {
+  border: none;
+  border-radius: 12px;
+  padding: 0;
+  width: min(520px, calc(100vw - 32px));
+  max-height: min(640px, calc(100vh - 64px));
+  background: var(--surface-1);
+  color: var(--text-primary);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+dialog.modal::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-head h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-body label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.modal-body textarea { min-height: 160px; }
+.modal-body .card-form { margin-bottom: 0; }
+.modal-body .hint { margin-top: 0; }
 
 .empty p { margin: 0; color: var(--text-secondary); font-size: 14px; }
 
@@ -469,7 +569,19 @@ textarea:focus-visible, select:focus-visible, .btn:focus-visible {
   font-variant-numeric: normal;
 }
 
-.date-input {
+.btn.link.refund { color: var(--critical); }
+
+/* 가맹점 · 카드 셀은 줄바꿈 있는 텍스트를 왼쪽 정렬로 그대로 보여준다 */
+.tx-table .merchant .btn.link,
+.tx-table .card-name .btn.link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  white-space: normal;
+  font-variant-numeric: normal;
+}
+
+.date-input, .cell-input {
   font: inherit;
   font-size: 12px;
   padding: 3px 6px;
@@ -478,3 +590,6 @@ textarea:focus-visible, select:focus-visible, .btn:focus-visible {
   background: var(--page);
   color: var(--text-primary);
 }
+
+.cell-input { width: 100%; }
+.cell-input.num-input { width: 100px; text-align: right; font-variant-numeric: tabular-nums; }

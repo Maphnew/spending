@@ -5,26 +5,38 @@
    가맹점명에 아래 키워드가 들어 있으면 해당 분류로 자동 배정한다.
    위에서부터 먼저 걸리는 규칙이 이긴다.
    ──────────────────────────────────────────── */
-const CATEGORIES = ['식비', '카페/간식', '편의점', '마트/쇼핑', '교통', '의료', '운동/취미', '통신/구독', '주거/공과금', '기타'];
+const CATEGORIES = [
+  '식재료', '건강식품', '기호식품', '주거', '교통', '개인', '쇼핑', '여행',
+  '보험, 곗돈', '전화, 인터넷, iCloud', '육아 - 교육', '육아 - 생필품', '육아 - 간식',
+  '건강/의료', '외식', '배달', '생활가전', '생필품', '경조사', '선물', '회사점심', '기타',
+];
 
 const CATEGORY_RULES = [
-  ['편의점',    ['GS25', 'CU ', '씨유', '세븐일레븐', '코리아세븐', '이마트24', '미니스톱', '스토리웨이']],
-  ['카페/간식', ['커피', '카페', 'CAFE', 'COFFEE', '스타벅스', '투썸', '이디야', '메가엠지씨', '빽다방', '컴포즈',
+  ['배달',      ['배달의민족', '배민', '요기요', '쿠팡이츠']],
+  ['외식',      ['식당', '국밥', '김밥', '분식', '치킨', '피자', '버거', '맥도날드', '롯데리아', '서브웨이',
+                '한식', '중식', '일식', '초밥', '스시', '고기', '삼겹', '곱창', '족발', '보쌈', '칼국수',
+                '면옥', '냉면', '쌀국수', '반점', '주점', '포차', '호프', '푸드', 'FOOD', '키친', 'KITCHEN']],
+  ['기호식품',  ['커피', '카페', 'CAFE', 'COFFEE', '스타벅스', '투썸', '이디야', '메가엠지씨', '빽다방', '컴포즈',
                 '파리바게', '뚜레쥬르', '베이커리', '디저트', '베스킨', '설빙', '공차', '탕후루']],
   ['교통',      ['택시', '카카오T', '코레일', '철도', '지하철', '버스', '교통', '주유', 'SK에너지', 'GS칼텍스',
-                '하이패스', '주차', '아마노', '쏘카', '티머니', '항공', '에어']],
-  ['의료',      ['약국', '병원', '의원', '치과', '한의', '클리닉', '메디컬']],
-  ['운동/취미', ['클라이밍', '짐', 'GYM', '피트니스', '헬스', '요가', '필라테스', '수영', '골프', 'CGV', '메가박스',
+                '하이패스', '주차', '아마노', '쏘카', '티머니']],
+  ['여행',      ['항공', '에어', '공항', '호텔', '에어비앤비', '펜션', '리조트', '여행사', '하나투어', '모두투어']],
+  ['건강/의료', ['약국', '병원', '의원', '치과', '한의', '클리닉', '메디컬']],
+  ['건강식품',  ['영양제', '비타민', '홍삼', '유산균', '프로틴', '건강원']],
+  ['육아 - 교육', ['어린이집', '유치원', '놀이학교', '문화센터', '학원']],
+  ['육아 - 생필품', ['기저귀', '분유']],
+  ['보험, 곗돈', ['보험료', '보험', '곗돈']],
+  ['주거',      ['관리비', '전기요금', '한국전력', '도시가스', '수도요금', '상하수도', '월세', '임대료']],
+  ['전화, 인터넷, iCloud', ['SKT', 'KT ', 'LGU', 'U+', '유플러스', '통신요금', '넷플릭스', 'NETFLIX', '유튜브', 'YOUTUBE',
+                '스포티파이', 'APPLE', 'ICLOUD', '아이클라우드', '구글', 'GOOGLE', '멜론', '왓챠', '티빙', '쿠팡플레이']],
+  ['생활가전',  ['하이마트', '전자랜드', '다나와', '이케아', '한샘']],
+  ['식재료',    ['이마트', '홈플러스', '롯데마트', '마켓컬리', '컬리', 'SSG', '오아시스', '농협', '정육', '식품']],
+  ['생필품',    ['다이소', '올리브영', 'GS25', 'CU ', '씨유', '세븐일레븐', '코리아세븐', '이마트24', '미니스톱', '스토리웨이']],
+  ['쇼핑',      ['쿠팡', '11번가', 'G마켓', '지마켓', '옥션', '네이버페이', '무신사', '배송', '스토어']],
+  ['경조사',    ['부의', '축의', '화환']],
+  ['선물',      ['선물', '기프트', 'GIFT']],
+  ['개인',      ['클라이밍', '짐', 'GYM', '피트니스', '헬스', '요가', '필라테스', '수영', '골프', 'CGV', '메가박스',
                 '롯데시네마', '서점', '문고']],
-  ['주거/공과금', ['관리비', '전기요금', '한국전력', '도시가스', '수도요금', '상하수도', '월세', '임대료', '보험료']],
-  ['통신/구독', ['SKT', 'KT ', 'LGU', 'U+', '유플러스', '통신요금', '넷플릭스', 'NETFLIX', '유튜브', 'YOUTUBE',
-                '스포티파이', 'APPLE', '구글', 'GOOGLE', '멜론', '왓챠', '티빙', '쿠팡플레이']],
-  ['마트/쇼핑', ['쿠팡', '이마트', '홈플러스', '롯데마트', '마켓컬리', '컬리', '11번가', 'G마켓', '지마켓', '옥션',
-                'SSG', '네이버페이', '올리브', '다이소', '무신사', '이케아', '한샘', '배송', '스토어']],
-  ['식비',      ['식당', '국밥', '김밥', '분식', '치킨', '피자', '버거', '맥도날드', '롯데리아', '서브웨이',
-                '한식', '중식', '일식', '초밥', '스시', '고기', '삼겹', '곱창', '족발', '보쌈', '칼국수',
-                '면옥', '냉면', '쌀국수', '반점', '식품', '주점', '포차', '호프', '배달의민족', '요기요',
-                '푸드', 'FOOD', '키친', 'KITCHEN']],
 ];
 
 /** 너무 짧아 부분일치로는 쓸 수 없는 상호는 완전일치로만 배정한다. */
@@ -49,6 +61,7 @@ const RE_RUNNING_VALUE = /(?:누적|잔액)\s*([\d,]+)\s*원?/;   // 같은 분�
 const RE_MASKED_NAME = /[가-힣A-Za-z]\*+[가-힣A-Za-z]*(님)?/g;
 const RE_INSTALLMENT = /\(\s*(일시불|\d+\s*개월)\s*\)|(?:^|\s)(일시불|\d+\s*개월)(?=\s|$)/g;
 const RE_BOILERPLATE = /(정상\s*승인\s*(되었습니다)?[.!]?|승인\s*되었습니다[.!]?|되었습니다[.!]?|자동이체된?\s*금액)/g;
+const RE_TABLE_DATE = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/;
 
 let idSeq = 0;
 /** 내역을 지목하기 위한 식별자. 중복 판정에는 쓰지 않는다(→ isSameTx). */
@@ -163,6 +176,50 @@ function parseSms(text) {
   return { parsed, failed };
 }
 
+/** 스프레드시트에서 복사한 탭 구분 표를 붙여넣을 때 쓴다.
+    한 줄 = "날짜(생략 가능) \t 금액 \t 가맹점 \t 분류". 날짜 칸이 비어 있으면
+    바로 위에서 마지막으로 읽은 날짜를 그대로 쓴다(병합 셀 흉내). */
+function parseTable(text) {
+  const parsed = [];
+  const failed = [];
+  let lastAt = null;
+
+  for (const line of text.split(/\r?\n/)) {
+    if (!line.trim()) continue;
+    const [dateRaw, amountRaw, merchantRaw, categoryRaw] = line.split('\t');
+
+    const dateMatch = dateRaw && dateRaw.match(RE_TABLE_DATE);
+    if (dateMatch) {
+      const [, y, mo, d] = dateMatch;
+      lastAt = new Date(Number(y), Number(mo) - 1, Number(d)).getTime();
+    }
+
+    const amount = Number(String(amountRaw || '').replace(/[^\d-]/g, ''));
+    const merchant = tidy(merchantRaw || '');
+    if (!merchant || !Number.isFinite(amount) || amount === 0) {
+      if (line.includes('원') || amountRaw) failed.push(line);
+      continue;
+    }
+
+    const categoryRawTidy = tidy(categoryRaw || '');
+    const category = CATEGORIES.includes(categoryRawTidy) ? categoryRawTidy : categorize(merchant);
+
+    parsed.push({
+      id: newId(),
+      at: lastAt,
+      amount,
+      merchant,
+      card: UNKNOWN_CARD,
+      running: null,
+      category,
+      canceled: amount < 0,
+      manual: true,
+    });
+  }
+
+  return { parsed, failed };
+}
+
 /* ────────────────────────────────────────────
    분류
    ──────────────────────────────────────────── */
@@ -180,58 +237,39 @@ function categorize(merchant) {
 }
 
 /* ────────────────────────────────────────────
-   저장소 (localStorage)
+   저장소 (서버 API)
    ──────────────────────────────────────────── */
-const STORAGE_KEY = 'spending-app/v1';
+const UNKNOWN_CARD = '카드 미상';
 
-/** 같은 결제인가?
-    일시·금액·가맹점이 모두 같아야 하고, 양쪽 다 누적 금액을 알고 있다면 그것까지 같아야 한다.
-    (같은 분에 같은 금액을 두 번 결제해도 누적은 다르므로 별개로 남는다.
-     누적을 모르는 예전 데이터와 비교할 때는 일시·금액·가맹점만 본다.) */
-function isSameTx(a, b) {
-  if (a.merchant !== b.merchant || a.amount !== b.amount || a.at !== b.at) return false;
-  if (a.running != null && b.running != null) return a.running === b.running;
-  return true;
+async function apiFetch(path, options) {
+  const res = await fetch(`/api${path}`, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+  });
+  if (!res.ok) throw new Error(`${path} 요청 실패 (${res.status})`);
+  return res.status === 204 ? null : res.json();
 }
 
 const store = {
   transactions: [],
   learned: {},   // 가맹점명 → 사용자가 직접 고른 분류
+  cards: [],     // 직접 입력에서 고를 수 있는 카드 목록(사용자가 설정)
 
-  load() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const data = JSON.parse(raw);
-      this.transactions = Array.isArray(data.transactions) ? data.transactions : [];
-      this.learned = data.learned && typeof data.learned === 'object' ? data.learned : {};
-    } catch (err) {
-      console.warn('저장된 데이터를 읽지 못했습니다.', err);
-    }
-  },
-
-  save() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        transactions: this.transactions,
-        learned: this.learned,
-      }));
-    } catch (err) {
-      console.warn('저장에 실패했습니다.', err);
-    }
-  },
-
-  /** 문자에서 읽은 건은 이미 담긴 것과 겹치면 건너뛴다(→ isSameTx).
-      직접 입력은 사용자가 의도한 것이므로 겹쳐도 그대로 담는다. */
-  add(list) {
-    const added = [];
-    for (const tx of list) {
-      if (!tx.manual && this.transactions.some((t) => isSameTx(t, tx))) continue;
-      this.transactions.push(tx);
-      added.push(tx);
-    }
+  async load() {
+    const data = await apiFetch('/state');
+    this.transactions = data.transactions;
+    this.learned = data.learned;
+    this.cards = data.cards;
     this.sort();
-    this.save();
+  },
+
+  /** 문자에서 읽은 건은 서버가 이미 담긴 것과 겹치면 건너뛴다.
+      직접 입력·표 붙여넣기(manual)는 사용자가 의도한 것이므로 겹쳐도 그대로 담는다. */
+  async add(list) {
+    if (!list.length) return [];
+    const { added } = await apiFetch('/transactions', { method: 'POST', body: JSON.stringify(list) });
+    this.transactions.push(...added);
+    this.sort();
     return added;
   },
 
@@ -245,34 +283,58 @@ const store = {
     });
   },
 
-  setDate(id, at) {
-    const tx = this.transactions.find((t) => t.id === id);
-    if (!tx) return;
-    tx.at = at;
+  /** 서버가 돌려준, 이번 수정으로 바뀐 행들을 로컬 목록에 반영한다.
+      분류 수정은 같은 가맹점 전체(+ learned)에 걸치므로 여러 행이 함께 올 수 있다. */
+  _mergePatch({ transactions, learned }) {
+    for (const tx of transactions) {
+      const i = this.transactions.findIndex((t) => t.id === tx.id);
+      if (i !== -1) this.transactions[i] = tx;
+    }
+    this.learned = learned;
+  },
+
+  async setDate(id, at) {
+    this._mergePatch(await apiFetch(`/transactions/${id}`, { method: 'PATCH', body: JSON.stringify({ at }) }));
     this.sort();
-    this.save();
   },
 
-  remove(id) {
+  async setMerchant(id, merchant) {
+    this._mergePatch(await apiFetch(`/transactions/${id}`, { method: 'PATCH', body: JSON.stringify({ merchant }) }));
+  },
+
+  async setAmount(id, amount) {
+    this._mergePatch(await apiFetch(`/transactions/${id}`, { method: 'PATCH', body: JSON.stringify({ amount }) }));
+  },
+
+  async setCard(id, card) {
+    this._mergePatch(await apiFetch(`/transactions/${id}`, { method: 'PATCH', body: JSON.stringify({ card }) }));
+  },
+
+  async setCategory(id, category) {
+    this._mergePatch(await apiFetch(`/transactions/${id}`, { method: 'PATCH', body: JSON.stringify({ category }) }));
+  },
+
+  async remove(id) {
+    await apiFetch(`/transactions/${id}`, { method: 'DELETE' });
     this.transactions = this.transactions.filter((t) => t.id !== id);
-    this.save();
   },
 
-  setCategory(id, category) {
-    const tx = this.transactions.find((t) => t.id === id);
-    if (!tx) return;
-    tx.category = category;
-    this.learned[tx.merchant] = category;      // 같은 가맹점은 다음부터 이 분류로
-    this.transactions.forEach((t) => {
-      if (t.merchant === tx.merchant) t.category = category;
-    });
-    this.save();
-  },
-
-  clear() {
+  async clear() {
+    await apiFetch('/transactions', { method: 'DELETE' });
     this.transactions = [];
     this.learned = {};
-    this.save();
+  },
+
+  async addCard(name) {
+    const trimmed = name.trim();
+    if (!trimmed || trimmed === UNKNOWN_CARD) return;
+    const { cards } = await apiFetch('/cards', { method: 'POST', body: JSON.stringify({ name: trimmed }) });
+    this.cards = cards;
+  },
+
+  async removeCard(name) {
+    await apiFetch(`/cards/${encodeURIComponent(name)}`, { method: 'DELETE' });
+    this.cards = this.cards.filter((c) => c !== name);
   },
 };
 
@@ -305,11 +367,20 @@ const el = {
   input: document.getElementById('sms-input'),
   parseBtn: document.getElementById('parse-btn'),
   status: document.getElementById('parse-status'),
+  tableInput: document.getElementById('table-input'),
+  tableParseBtn: document.getElementById('table-parse-btn'),
+  tableStatus: document.getElementById('table-status'),
   monthFilter: document.getElementById('month-filter'),
   cardFilter: document.getElementById('card-filter'),
   chartCard: document.getElementById('chart-card'),
   chartCardSection: document.getElementById('chart-card-section'),
-  cardList: document.getElementById('card-list'),
+  cardForm: document.getElementById('card-form'),
+  cardNameInput: document.getElementById('card-name-input'),
+  cardSettingsList: document.getElementById('card-settings-list'),
+  cardModal: document.getElementById('card-modal'),
+  openCardModalBtn: document.getElementById('open-card-modal'),
+  tableModal: document.getElementById('table-modal'),
+  openTableModalBtn: document.getElementById('open-table-modal'),
   mCard: document.getElementById('m-card'),
   exportBtn: document.getElementById('export-csv'),
   clearBtn: document.getElementById('clear-all'),
@@ -346,7 +417,7 @@ el.mDate.value = dayKey(Date.now());
 let selectedMonth = 'all';
 let selectedCard = 'all';
 
-const cardLabel = (tx) => tx.card || '카드 미상';
+const cardLabel = (tx) => tx.card || UNKNOWN_CARD;
 
 function visibleTransactions() {
   return store.transactions.filter((t) => {
@@ -403,9 +474,47 @@ function renderCardFilter() {
     .concat(cards.map((c) => `<option value="${c}">${c}</option>`))
     .join('');
   el.cardFilter.value = selectedCard;
+}
 
-  // 직접 입력 폼의 카드 이름 자동완성도 같이 채운다
-  el.cardList.innerHTML = cards.map((c) => `<option value="${c}"></option>`).join('');
+/** 설정에 등록된 카드 칩 목록. */
+function renderCardSettings() {
+  if (!store.cards.length) {
+    el.cardSettingsList.innerHTML = '<li class="chip-empty">등록된 카드가 없습니다. 위에서 추가해 주세요.</li>';
+    return;
+  }
+
+  el.cardSettingsList.innerHTML = '';
+  for (const name of store.cards) {
+    const li = document.createElement('li');
+    li.className = 'chip';
+
+    const label = document.createElement('span');
+    label.textContent = name;
+
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'chip-remove';
+    del.textContent = '×';
+    del.title = `${name} 삭제`;
+    del.setAttribute('aria-label', `${name} 삭제`);
+    del.addEventListener('click', async () => {
+      await store.removeCard(name);
+      renderCardSettings();
+      renderManualCardOptions();
+    });
+
+    li.append(label, del);
+    el.cardSettingsList.appendChild(li);
+  }
+}
+
+/** 직접 입력 폼의 카드 드롭다운. 카드 미상이 항상 첫 항목이다. */
+function renderManualCardOptions() {
+  const prev = el.mCard.value;
+  el.mCard.innerHTML = [`<option value="${UNKNOWN_CARD}">${UNKNOWN_CARD}</option>`]
+    .concat(store.cards.map((c) => `<option value="${c}">${c}</option>`))
+    .join('');
+  el.mCard.value = [UNKNOWN_CARD, ...store.cards].includes(prev) ? prev : UNKNOWN_CARD;
 }
 
 function renderMonthFilter() {
@@ -574,22 +683,149 @@ function dateCell(tx, cell) {
     input.className = 'date-input';
     input.value = inputValue(tx.at === null ? Date.now() : tx.at);
 
-    const commit = () => {
+    // render()가 이 input을 DOM에서 떼어내면 브라우저가 자동으로 blur를 쏘므로,
+    // commit이 시작하자마자 blur 리스너부터 떼서 재진입(중복 저장·Escape 후 저장)을 막는다.
+    const commit = async () => {
+      input.removeEventListener('blur', commit);
       if (!input.value) { render(); return; }
       const next = new Date(input.value).getTime();
-      if (Number.isFinite(next)) store.setDate(tx.id, next);
+      if (Number.isFinite(next)) {
+        try { await store.setDate(tx.id, next); }
+        catch (err) { console.error('일시 저장 실패', err); }
+      }
       render();
     };
+    const cancel = () => { input.removeEventListener('blur', commit); render(); };
 
     input.addEventListener('change', commit);
     input.addEventListener('blur', commit);
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') commit();
-      if (e.key === 'Escape') render();
+      if (e.key === 'Escape') cancel();
     });
 
     cell.replaceChildren(input);
     input.focus();
+  });
+
+  return button;
+}
+
+/** 가맹점 셀. 누르면 그 자리에서 이름을 고칠 수 있다. */
+function merchantCell(tx, cell) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'btn link';
+  button.textContent = tx.merchant;
+  button.title = '가맹점 수정';
+
+  button.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'cell-input';
+    input.value = tx.merchant;
+
+    const commit = async () => {
+      input.removeEventListener('blur', commit);
+      const value = input.value.trim();
+      if (value) {
+        try { await store.setMerchant(tx.id, value); }
+        catch (err) { console.error('가맹점 저장 실패', err); }
+      }
+      render();
+    };
+    const cancel = () => { input.removeEventListener('blur', commit); render(); };
+
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+
+    cell.replaceChildren(input);
+    input.focus();
+    input.select();
+  });
+
+  return button;
+}
+
+/** 카드 셀. 누르면 그 자리에서 카드 설정 목록 중 골라 바꿀 수 있다. */
+function cardCell(tx, cell) {
+  const current = cardLabel(tx);
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'btn link';
+  button.textContent = current;
+  button.title = '카드 수정';
+
+  button.addEventListener('click', () => {
+    const select = document.createElement('select');
+    select.className = 'cat-select';
+
+    const options = [UNKNOWN_CARD, ...store.cards];
+    if (!options.includes(current)) options.push(current);
+    for (const name of options) {
+      const option = document.createElement('option');
+      option.value = name;
+      option.textContent = name;
+      if (name === current) option.selected = true;
+      select.appendChild(option);
+    }
+
+    select.addEventListener('change', async () => {
+      try { await store.setCard(tx.id, select.value); }
+      catch (err) { console.error('카드 저장 실패', err); }
+      render();
+    });
+    select.addEventListener('blur', () => render());
+    select.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') render();
+    });
+
+    cell.replaceChildren(select);
+    select.focus();
+  });
+
+  return button;
+}
+
+/** 금액 셀. 누르면 그 자리에서 금액을 고칠 수 있다(환불·취소는 음수로). */
+function amountCell(tx, cell) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = tx.amount < 0 ? 'btn link refund' : 'btn link';
+  button.textContent = won(tx.amount);
+  button.title = '금액 수정';
+
+  button.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.className = 'cell-input num-input';
+    input.step = '10';
+    input.value = tx.amount;
+
+    const commit = async () => {
+      input.removeEventListener('blur', commit);
+      const value = Number(input.value);
+      if (Number.isFinite(value) && value !== 0) {
+        try { await store.setAmount(tx.id, value); }
+        catch (err) { console.error('금액 저장 실패', err); }
+      }
+      render();
+    };
+    const cancel = () => { input.removeEventListener('blur', commit); render(); };
+
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+
+    cell.replaceChildren(input);
+    input.focus();
+    input.select();
   });
 
   return button;
@@ -607,12 +843,11 @@ function renderTable(txs) {
 
     const merchant = document.createElement('td');
     merchant.className = 'merchant';
-    merchant.textContent = tx.merchant;
+    merchant.appendChild(merchantCell(tx, merchant));
 
     const card = document.createElement('td');
     card.className = 'card-name';
-    card.textContent = cardLabel(tx);
-    card.title = cardLabel(tx);
+    card.appendChild(cardCell(tx, card));
 
     const category = document.createElement('td');
     const select = document.createElement('select');
@@ -625,15 +860,16 @@ function renderTable(txs) {
       if (c === tx.category) option.selected = true;
       select.appendChild(option);
     }
-    select.addEventListener('change', () => {
-      store.setCategory(tx.id, select.value);
+    select.addEventListener('change', async () => {
+      try { await store.setCategory(tx.id, select.value); }
+      catch (err) { console.error('분류 저장 실패', err); }
       render();
     });
     category.appendChild(select);
 
     const amount = document.createElement('td');
-    amount.className = tx.amount < 0 ? 'num refund' : 'num';
-    amount.textContent = won(tx.amount);
+    amount.className = 'num';
+    amount.appendChild(amountCell(tx, amount));
 
     const actions = document.createElement('td');
     const del = document.createElement('button');
@@ -642,8 +878,9 @@ function renderTable(txs) {
     del.textContent = '×';
     del.title = '삭제';
     del.setAttribute('aria-label', `${tx.merchant} 내역 삭제`);
-    del.addEventListener('click', () => {
-      store.remove(tx.id);
+    del.addEventListener('click', async () => {
+      try { await store.remove(tx.id); }
+      catch (err) { console.error('삭제 실패', err); }
       render();
     });
     actions.appendChild(del);
@@ -658,9 +895,9 @@ function renderTable(txs) {
    ──────────────────────────────────────────── */
 function toCsv(txs) {
   const escape = (v) => `"${String(v).replace(/"/g, '""')}"`;
-  const header = ['일시', '가맹점', '분류', '금액', '카드'];
+  const header = ['날짜', '금액', '설명', '카테고리'];
   const rows = txs.map((t) => [
-    t.at === null ? '' : dateTimeLabel(t.at), t.merchant, t.category, t.amount, t.card,
+    t.at === null ? '' : dayKey(t.at), t.amount, `${t.merchant} (${cardLabel(t)})`, t.category,
   ].map(escape).join(','));
   return `﻿${header.map(escape).join(',')}\n${rows.join('\n')}\n`;
 }
@@ -682,7 +919,7 @@ function downloadCsv() {
 /* ────────────────────────────────────────────
    이벤트
    ──────────────────────────────────────────── */
-function handleParse() {
+async function handleParse() {
   const text = el.input.value.trim();
   if (!text) {
     setStatus('문자를 먼저 붙여넣어 주세요.', true);
@@ -695,7 +932,14 @@ function handleParse() {
     return;
   }
 
-  const added = store.add(parsed);
+  let added;
+  try {
+    added = await store.add(parsed);
+  } catch (err) {
+    setStatus('서버에 저장하지 못했습니다. 서버가 켜져 있는지 확인해 주세요.', true);
+    console.error(err);
+    return;
+  }
   const skipped = parsed.length - added.length;
   const undated = added.filter((t) => t.at === null).length;
   const parts = [`${added.length}건 추가`];
@@ -708,8 +952,38 @@ function handleParse() {
   render();
 }
 
+/** 스프레드시트 표(탭 구분)를 붙여넣었을 때. */
+async function handleTableParse() {
+  const text = el.tableInput.value.trim();
+  if (!text) {
+    setTableStatus('표 데이터를 먼저 붙여넣어 주세요.', true);
+    return;
+  }
+
+  const { parsed, failed } = parseTable(text);
+  if (!parsed.length) {
+    setTableStatus('인식할 수 있는 줄을 찾지 못했습니다.', true);
+    return;
+  }
+
+  let added;
+  try {
+    added = await store.add(parsed);
+  } catch (err) {
+    setTableStatus('서버에 저장하지 못했습니다. 서버가 켜져 있는지 확인해 주세요.', true);
+    console.error(err);
+    return;
+  }
+  const parts = [`${added.length}건 추가`];
+  if (failed.length) parts.push(`인식 실패 ${failed.length}건`);
+  setTableStatus(parts.join(' · '));
+
+  el.tableInput.value = '';
+  render();
+}
+
 /** 직접 입력 폼 → 내역 한 건 추가. */
-function handleManualAdd(e) {
+async function handleManualAdd(e) {
   e.preventDefault();
 
   const merchant = el.mMerchant.value.trim();
@@ -723,17 +997,23 @@ function handleManualAdd(e) {
 
   const category = el.mCategory.value === 'auto' ? categorize(merchant) : el.mCategory.value;
 
-  store.add([{
-    id: newId(),
-    at: Number.isFinite(at) ? at : null,
-    amount,
-    merchant,
-    card: el.mCard.value.trim() || '직접 입력',
-    running: null,
-    category,
-    canceled: amount < 0,
-    manual: true,
-  }]);
+  try {
+    await store.add([{
+      id: newId(),
+      at: Number.isFinite(at) ? at : null,
+      amount,
+      merchant,
+      card: el.mCard.value || UNKNOWN_CARD,
+      running: null,
+      category,
+      canceled: amount < 0,
+      manual: true,
+    }]);
+  } catch (err) {
+    setManualStatus('서버에 저장하지 못했습니다. 서버가 켜져 있는지 확인해 주세요.', true);
+    console.error(err);
+    return;
+  }
 
   setManualStatus(`${merchant} ${won(amount)} 추가`);
   el.mMerchant.value = '';
@@ -753,12 +1033,37 @@ function setManualStatus(message, isError = false) {
   el.manualStatus.classList.toggle('error', isError);
 }
 
+function setTableStatus(message, isError = false) {
+  el.tableStatus.textContent = message;
+  el.tableStatus.classList.toggle('error', isError);
+}
+
 el.parseBtn.addEventListener('click', handleParse);
+el.tableParseBtn.addEventListener('click', handleTableParse);
 el.manualForm.addEventListener('submit', handleManualAdd);
+
+el.cardForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = el.cardNameInput.value.trim();
+  if (!name) return;
+  try {
+    await store.addCard(name);
+  } catch (err) {
+    console.error('카드 추가 실패', err);
+    return;
+  }
+  el.cardNameInput.value = '';
+  renderCardSettings();
+  renderManualCardOptions();
+});
 
 // ⌘/Ctrl + Enter 로도 정리
 el.input.addEventListener('keydown', (e) => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') handleParse();
+});
+
+el.tableInput.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') handleTableParse();
 });
 
 el.monthFilter.addEventListener('change', () => {
@@ -773,13 +1078,50 @@ el.cardFilter.addEventListener('change', () => {
 
 el.exportBtn.addEventListener('click', downloadCsv);
 
-el.clearBtn.addEventListener('click', () => {
+el.clearBtn.addEventListener('click', async () => {
   if (!store.transactions.length) return;
   if (!confirm('저장된 내역을 모두 지울까요? 되돌릴 수 없습니다.')) return;
-  store.clear();
+  try {
+    await store.clear();
+  } catch (err) {
+    console.error('전체 삭제 실패', err);
+    return;
+  }
   setStatus('');
   render();
 });
 
-store.load();
-render();
+/** 바깥(뒷배경)을 눌러도 닫히게 한다. dialog 자신이 콘텐츠 크기만큼만 차지하므로,
+    클릭 좌표가 실제 박스 밖이면 배경을 누른 것으로 본다. */
+function bindModalBackdropClose(dialog) {
+  dialog.addEventListener('click', (e) => {
+    const rect = dialog.getBoundingClientRect();
+    const inside = e.clientX >= rect.left && e.clientX <= rect.right
+      && e.clientY >= rect.top && e.clientY <= rect.bottom;
+    if (!inside) dialog.close();
+  });
+}
+bindModalBackdropClose(el.cardModal);
+bindModalBackdropClose(el.tableModal);
+
+el.openCardModalBtn.addEventListener('click', () => {
+  el.cardModal.showModal();
+  el.cardNameInput.focus();
+});
+
+el.openTableModalBtn.addEventListener('click', () => {
+  el.tableModal.showModal();
+  el.tableInput.focus();
+});
+
+(async () => {
+  try {
+    await store.load();
+  } catch (err) {
+    setStatus('서버에 연결하지 못했습니다. 서버가 켜져 있는지 확인해 주세요.', true);
+    console.error(err);
+  }
+  renderCardSettings();
+  renderManualCardOptions();
+  render();
+})();

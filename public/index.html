@@ -13,10 +13,44 @@
     <div class="topbar-actions">
       <select id="card-filter" aria-label="카드 선택"></select>
       <select id="month-filter" aria-label="기간 선택"></select>
+      <button id="open-table-modal" class="btn ghost" type="button">표로 추가</button>
+      <button id="open-card-modal" class="btn ghost" type="button">카드 설정</button>
       <button id="export-csv" class="btn ghost" type="button">CSV 내보내기</button>
       <button id="clear-all" class="btn ghost danger" type="button">전체 삭제</button>
     </div>
   </header>
+
+  <dialog id="card-modal" class="modal">
+    <form method="dialog" class="modal-head">
+      <h2>카드 설정</h2>
+      <button class="btn icon" type="submit" aria-label="닫기">×</button>
+    </form>
+    <div class="modal-body">
+      <form id="card-form" class="card-form">
+        <input type="text" id="card-name-input" placeholder="예: 현대카드 M" autocomplete="off">
+        <button class="btn primary" type="submit">추가</button>
+      </form>
+      <ul id="card-settings-list" class="card-chip-list"></ul>
+      <p class="hint">여기서 등록한 카드가 <strong>직접 입력</strong>의 카드 목록에 뜬다. 카드를 모르면 &ldquo;카드 미상&rdquo;을 그대로 두면 된다.</p>
+    </div>
+  </dialog>
+
+  <dialog id="table-modal" class="modal">
+    <form method="dialog" class="modal-head">
+      <h2>스프레드시트 표 붙여넣기</h2>
+      <button class="btn icon" type="submit" aria-label="닫기">×</button>
+    </form>
+    <div class="modal-body">
+      <label for="table-input">스프레드시트 표(탭 구분)를 붙여넣으세요</label>
+      <textarea id="table-input" rows="8" spellcheck="false"
+        placeholder="2026년8월2일&#9;27,900&#9;오징어 6미&#9;식재료&#10;&#9;24,146&#9;아보카도&#9;식재료"></textarea>
+      <div class="paste-actions">
+        <button id="table-parse-btn" class="btn primary" type="button">표 추가하기</button>
+        <span id="table-status" class="status" role="status" aria-live="polite"></span>
+      </div>
+      <p class="hint">한 줄에 날짜(선택) · 금액 · 가맹점 · 분류 순서로 탭 구분. 날짜 칸을 비우면 바로 위 날짜를 그대로 쓴다(엑셀 병합 셀처럼).</p>
+    </div>
+  </dialog>
 
   <div class="inputs">
     <section class="paste card">
@@ -46,8 +80,7 @@
         </div>
         <div class="field">
           <label for="m-card">카드</label>
-          <input type="text" id="m-card" list="card-list" placeholder="직접 입력" autocomplete="off">
-          <datalist id="card-list"></datalist>
+          <select id="m-card"></select>
         </div>
         <div class="field">
           <label for="m-amount">금액</label>
