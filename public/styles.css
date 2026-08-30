@@ -241,7 +241,7 @@ textarea:focus-visible, select:focus-visible, .btn:focus-visible {
 
 #manual-status { display: block; margin-top: 6px; }
 
-/* ── 카드 설정 ───────────────────────────── */
+/* ── 지출 설정(카드·현금 등 결제 수단) ───────── */
 .card-form {
   display: flex;
   gap: 8px;

@@ -414,7 +414,8 @@ el.mCategory.innerHTML = ['<option value="auto">자동 분류</option>']
   .join('');
 el.mDate.value = dayKey(Date.now());
 
-let selectedMonth = 'all';
+// 이번 달 데이터가 있으면 그 달로 시작한다(없으면 아래 renderMonthFilter가 '전체 기간'으로 되돌린다).
+let selectedMonth = monthKey(Date.now());
 let selectedCard = 'all';
 
 const cardLabel = (tx) => tx.card || UNKNOWN_CARD;
@@ -476,10 +477,10 @@ function renderCardFilter() {
   el.cardFilter.value = selectedCard;
 }
 
-/** 설정에 등록된 카드 칩 목록. */
+/** 지출 설정에 등록된 결제 수단(카드·현금 등) 칩 목록. */
 function renderCardSettings() {
   if (!store.cards.length) {
-    el.cardSettingsList.innerHTML = '<li class="chip-empty">등록된 카드가 없습니다. 위에서 추가해 주세요.</li>';
+    el.cardSettingsList.innerHTML = '<li class="chip-empty">등록된 결제 수단이 없습니다. 위에서 추가해 주세요.</li>';
     return;
   }
 
@@ -750,7 +751,7 @@ function merchantCell(tx, cell) {
   return button;
 }
 
-/** 카드 셀. 누르면 그 자리에서 카드 설정 목록 중 골라 바꿀 수 있다. */
+/** 카드 셀. 누르면 그 자리에서 지출 설정에 등록한 목록 중 골라 바꿀 수 있다. */
 function cardCell(tx, cell) {
   const current = cardLabel(tx);
 

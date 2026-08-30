@@ -14,7 +14,7 @@
       <select id="card-filter" aria-label="카드 선택"></select>
       <select id="month-filter" aria-label="기간 선택"></select>
       <button id="open-table-modal" class="btn ghost" type="button">표로 추가</button>
-      <button id="open-card-modal" class="btn ghost" type="button">카드 설정</button>
+      <button id="open-card-modal" class="btn ghost" type="button">지출 설정</button>
       <button id="export-csv" class="btn ghost" type="button">CSV 내보내기</button>
       <button id="clear-all" class="btn ghost danger" type="button">전체 삭제</button>
     </div>
@@ -22,16 +22,16 @@
 
   <dialog id="card-modal" class="modal">
     <form method="dialog" class="modal-head">
-      <h2>카드 설정</h2>
+      <h2>지출 설정</h2>
       <button class="btn icon" type="submit" aria-label="닫기">×</button>
     </form>
     <div class="modal-body">
       <form id="card-form" class="card-form">
-        <input type="text" id="card-name-input" placeholder="예: 현대카드 M" autocomplete="off">
+        <input type="text" id="card-name-input" placeholder="예: 현대카드 M, 현금" autocomplete="off">
         <button class="btn primary" type="submit">추가</button>
       </form>
       <ul id="card-settings-list" class="card-chip-list"></ul>
-      <p class="hint">여기서 등록한 카드가 <strong>직접 입력</strong>의 카드 목록에 뜬다. 카드를 모르면 &ldquo;카드 미상&rdquo;을 그대로 두면 된다.</p>
+      <p class="hint">여기서 등록한 카드·현금 같은 결제 수단이 <strong>직접 입력</strong>의 카드 목록에 뜬다. 뭘로 냈는지 모르면 &ldquo;카드 미상&rdquo;을 그대로 두면 된다.</p>
     </div>
   </dialog>
 
