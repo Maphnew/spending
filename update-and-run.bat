@@ -6,7 +6,7 @@ for /f "delims=" %%p in ('pm2 pid spending 2^>nul') do set PM2PID=%%p
 
 if defined PM2PID (
     if not "%PM2PID%"=="0" (
-        echo === spending is already running (pid %PM2PID%). Stopping... ===
+        echo === spending is already running, pid %PM2PID%. Stopping... ===
         call pm2 delete spending
         echo.
         echo Stopped.
