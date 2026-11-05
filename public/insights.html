@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>지출 계획 · 소비 정리</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="insights.css">
+  <script defer src="insights.js"></script>
+</head>
+<body>
+<main class="insights-app">
+  <header class="insights-header">
+    <a href="/" class="back-link">← 소비 정리</a>
+    <div class="header-actions"><span id="updated-at" class="muted"></span><button id="refresh-analysis" class="btn primary" type="button">분석 새로고침</button></div>
+  </header>
+  <div class="page-intro"><p class="eyebrow">나의 지출 계획</p><h1>오늘의 소비, 내일의 여유.</h1><p>거래 내역과 과거 가계부를 함께 보고, 매달의 계획을 확인하세요.</p></div>
+  <p id="analysis-status" class="analysis-status" role="status" aria-live="polite">분석 결과를 불러오고 있습니다…</p>
+  <nav class="insights-nav" aria-label="분석 메뉴">
+    <a href="#plan" data-panel="plan" aria-current="page">지출 계획</a>
+    <a href="#fixed" data-panel="fixed">고정지출</a>
+    <a href="#categories" data-panel="categories">카테고리 분석</a>
+  </nav>
+  <div id="insights-content" aria-busy="true"></div>
+  <footer class="insights-footer">분석 새로고침은 최신 거래를 반영합니다. 과거 시트 원본과 입력한 거래는 유지됩니다.</footer>
+</main>
+</body>
+</html>

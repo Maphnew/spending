@@ -6,7 +6,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "migrate-csv": "node migrate-csv.js"
+    "migrate-csv": "node migrate-csv.js",
+    "test:insights": "node test-insights.js"
   },
   "dependencies": {
     "better-sqlite3": "^11.10.0",

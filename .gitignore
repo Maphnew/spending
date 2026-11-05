@@ -1,4 +1,6 @@
 node_modules/
+insights-cache.json
+insights-cache.json.tmp
 spending.db
 spending.db-journal
 spending.db-wal
