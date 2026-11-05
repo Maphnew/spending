@@ -385,6 +385,20 @@ dialog.modal::backdrop {
 
 .chart-card { min-width: 0; }
 
+/* 월별 분류 지출과 예산 비교 */
+.budget-chart-note { margin: 0 0 8px; color: var(--text-secondary); font-size: 11px; line-height: 1.7; }
+.budget-chart-summary { display: flex; flex-wrap: wrap; gap: 5px 12px; padding: 12px; background: var(--hover-wash); border-radius: 8px; font-size: 12px; }
+.budget-chart-summary strong { flex-basis: 100%; font-size: 15px; }
+.budget-category-row { padding: 9px 0; border-bottom: 1px solid var(--border); }
+.budget-category-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 12px; }
+.budget-category-heading > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.budget-category-heading > span:last-child { flex-shrink: 0; font-size: 11px; color: var(--text-secondary); }
+.budget-category-amounts { margin: 5px 0 7px; font-size: 11px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.budget-category-track { height: 7px; border-radius: 5px; background: var(--hover-wash); overflow: hidden; }
+.budget-category-fill { height: 100%; background: var(--accent); border-radius: 5px; }
+.budget-category-fill.exceeded { background: var(--critical); }
+.budget-over, .budget-category-heading > .budget-over { color: var(--critical); }
+
 /* 분류별: 가로 막대 */
 .bars { display: flex; flex-direction: column; gap: 10px; }
 

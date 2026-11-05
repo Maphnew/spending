@@ -417,6 +417,23 @@ el.mDate.value = dayKey(Date.now());
 // 이번 달 데이터가 있으면 그 달로 시작한다(없으면 아래 renderMonthFilter가 '전체 기간'으로 되돌린다).
 let selectedMonth = monthKey(Date.now());
 let selectedCard = 'all';
+let categoryBudget = { groups: null, loading: false, error: false };
+
+async function loadCategoryBudget() {
+  if (categoryBudget.loading) return;
+  categoryBudget.loading = true;
+  try {
+    const insights = await apiFetch('/insights');
+    categoryBudget.groups = SpendingBudget.buildGroups(insights.plan, insights.fixed);
+    categoryBudget.error = false;
+  } catch (error) {
+    categoryBudget.error = true;
+    console.error('계획금액 불러오기 실패', error);
+  } finally {
+    categoryBudget.loading = false;
+    renderCategoryChart(visibleTransactions());
+  }
+}
 
 const cardLabel = (tx) => tx.card || UNKNOWN_CARD;
 
@@ -605,7 +622,52 @@ function renderBars(container, rows) {
 }
 
 function renderCategoryChart(txs) {
-  renderBars(el.chartCategory, groupSum(txs, (t) => t.category).filter((r) => r.value > 0));
+  if (selectedMonth === 'all' || !categoryBudget.groups) {
+    renderBars(el.chartCategory, groupSum(txs, (t) => t.category).filter((r) => r.value > 0));
+    const note = document.createElement('p');
+    note.className = 'budget-chart-note';
+    note.textContent = selectedMonth === 'all'
+      ? '월을 선택하면 현재 월 계획금액과 비교할 수 있습니다.'
+      : categoryBudget.error ? '계획금액을 불러오지 못했습니다. 실제 지출만 표시합니다.' : '계획금액을 불러오는 중입니다…';
+    el.chartCategory.prepend(note);
+    if (categoryBudget.error) {
+      const retry = document.createElement('button');
+      retry.type = 'button';retry.className = 'btn ghost';retry.textContent = '계획 다시 불러오기';
+      retry.addEventListener('click', loadCategoryBudget);el.chartCategory.append(retry);
+    }
+    return;
+  }
+  const comparison = SpendingBudget.compare(txs, categoryBudget.groups);
+  el.chartCategory.replaceChildren();
+  const note = document.createElement('p');note.className = 'budget-chart-note';
+  note.textContent = `${selectedMonth} 실제 / 현재 월 예산 초안 · 청약 제외${selectedCard !== 'all' ? ' · 선택 카드 지출만 표시, 계획은 가구 전체 기준' : ''}`;
+  const summary = document.createElement('div');summary.className = 'budget-chart-summary';
+  const actual = document.createElement('strong');actual.textContent = `실제 ${won(comparison.actual)}`;
+  const budget = document.createElement('span');budget.textContent = `계획 ${won(comparison.budget)}`;
+  const remaining = document.createElement('span');
+  remaining.className = comparison.actual > comparison.budget ? 'budget-over' : '';
+  remaining.textContent = selectedCard === 'all'
+    ? comparison.actual > comparison.budget ? `${won(comparison.actual - comparison.budget)} 초과` : `${won(comparison.budget - comparison.actual)} 남음`
+    : '카드별 예산은 배분하지 않았습니다.';
+  summary.append(actual, budget, remaining);el.chartCategory.append(note, summary);
+  for (const row of comparison.rows) {
+    const wrap=document.createElement('div');wrap.className='budget-category-row';
+    const heading=document.createElement('div');heading.className='budget-category-heading';
+    const label=document.createElement('span');label.textContent=row.label;label.title=row.categories.join(' · ')+(row.note ? ' · '+row.note : '');
+    const state=document.createElement('span');
+    state.textContent=row.budget==null ? '계획 없음' : row.remaining<0 ? `${won(-row.remaining)} 초과` : `${won(row.remaining)} ${selectedCard==='all'?'남음':'차이'}`;
+    if(row.remaining<0)state.className='budget-over';
+    heading.append(label,state);
+    const amounts=document.createElement('div');amounts.className='budget-category-amounts';
+    amounts.textContent=`실제 ${won(row.actual)} / 계획 ${row.budget==null?'미설정':won(row.budget)}${row.ratio==null?'':` · ${Math.round(row.ratio*100)}%`}`;
+    const track=document.createElement('div');track.className='budget-category-track';track.setAttribute('role','img');track.setAttribute('aria-label',`${row.label}: ${amounts.textContent}`);
+    const fill=document.createElement('div');fill.className='budget-category-fill'+(row.remaining<0?' exceeded':'');
+    fill.style.width=`${row.ratio==null?0:Math.max(0,Math.min(row.ratio*100,100))}%`;
+    track.append(fill);wrap.append(heading,amounts,track);el.chartCategory.append(wrap);
+  }
+  const foot=document.createElement('p');foot.className='budget-chart-note';
+  foot.textContent=`공동 예산은 분류를 묶어 비교합니다. 실제 결제 기준이므로 적립형 항목은 결제한 달에 초과할 수 있습니다.${comparison.savings ? ` 청약 ${won(comparison.savings)}은 저축으로 별도 처리했습니다.` : ''}`;
+  el.chartCategory.append(foot);
 }
 
 function renderCardChart(txs) {
@@ -1116,6 +1178,7 @@ el.openTableModalBtn.addEventListener('click', () => {
 });
 
 (async () => {
+  loadCategoryBudget();
   try {
     await store.load();
   } catch (err) {
@@ -1126,3 +1189,5 @@ el.openTableModalBtn.addEventListener('click', () => {
   renderManualCardOptions();
   render();
 })();
+
+window.addEventListener('focus', loadCategoryBudget);
