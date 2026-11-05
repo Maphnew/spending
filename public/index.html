@@ -7,6 +7,15 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div class="spending-layout" id="spending-layout">
+  <aside id="category-sidebar" class="category-sidebar" aria-labelledby="category-chart-title" hidden>
+    <section id="category-chart-card" class="card chart-card category-chart-card">
+      <h2 id="category-chart-title">분류별 지출</h2>
+      <div class="category-budget-scroll" tabindex="0" role="region" aria-label="분류별 지출 스크롤 영역">
+        <div id="chart-category" class="bars"></div>
+      </div>
+    </section>
+  </aside>
 <div class="app">
   <header class="topbar">
     <h1>소비 정리</h1>
@@ -128,12 +137,9 @@
       </div>
     </section>
 
-    <div class="charts">
-      <section class="card chart-card">
-        <h2>분류별 지출</h2>
-        <div id="chart-category" class="bars"></div>
-      </section>
+    <div id="category-inline-slot" hidden></div>
 
+    <div class="charts">
       <section class="card chart-card">
         <h2>일별 지출</h2>
         <div id="chart-daily" class="columns-wrap"></div>
@@ -168,6 +174,7 @@
   </div>
 
   <div id="tooltip" class="tooltip" hidden></div>
+</div>
 </div>
 <script src="budget-comparison.js"></script>
 <script src="app.js"></script>

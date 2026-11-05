@@ -385,6 +385,32 @@ dialog.modal::backdrop {
 
 .chart-card { min-width: 0; }
 
+/* 넓은 화면에서 분류 카드를 본문 왼쪽에 고정한다. */
+.spending-layout.has-category-sidebar {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1040px);
+  align-items: start;
+  gap: 24px;
+  max-width: 1424px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.spending-layout.has-category-sidebar > .app { width: 100%; min-width: 0; padding-left: 0; padding-right: 0; }
+.category-sidebar { position: sticky; top: 24px; align-self: start; margin-top: 24px; min-width: 0; }
+.category-chart-card { display: flex; flex-direction: column; max-height: calc(100vh - 48px); max-height: calc(100dvh - 48px); }
+.category-chart-card > h2 { flex-shrink: 0; }
+.category-budget-scroll { overflow-y: auto; overflow-x: hidden; min-height: 0; scrollbar-gutter: stable; overscroll-behavior-y: contain; padding-right: 6px; }
+.category-budget-scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+#category-inline-slot { margin: 16px 0; }
+#category-inline-slot .category-chart-card { max-height: 540px; max-height: min(70dvh, 540px); }
+.spending-layout .topbar-actions { flex-wrap: wrap; max-width: 100%; }
+.spending-layout .table-scroll { position: relative; max-width: 100%; }
+
+@media (max-width: 1199px) {
+  .spending-layout .inputs, .spending-layout .charts { grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+  .spending-layout .app { min-width: 0; }
+}
+
 /* 월별 분류 지출과 예산 비교 */
 .budget-chart-note { margin: 0 0 8px; color: var(--text-secondary); font-size: 11px; line-height: 1.7; }
 .budget-chart-summary { display: flex; flex-wrap: wrap; gap: 5px 12px; padding: 12px; background: var(--hover-wash); border-radius: 8px; font-size: 12px; }

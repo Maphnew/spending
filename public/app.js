@@ -395,6 +395,10 @@ const el = {
   kpiTopCat: document.getElementById('kpi-top-cat'),
   kpiTopCatAmt: document.getElementById('kpi-top-cat-amt'),
   chartCategory: document.getElementById('chart-category'),
+  categorySidebar: document.getElementById('category-sidebar'),
+  categoryCard: document.getElementById('category-chart-card'),
+  categoryInlineSlot: document.getElementById('category-inline-slot'),
+  spendingLayout: document.getElementById('spending-layout'),
   chartDaily: document.getElementById('chart-daily'),
   txBody: document.getElementById('tx-body'),
   txCount: document.getElementById('tx-count'),
@@ -418,6 +422,18 @@ el.mDate.value = dayKey(Date.now());
 let selectedMonth = monthKey(Date.now());
 let selectedCard = 'all';
 let categoryBudget = { groups: null, loading: false, error: false };
+const categorySidebarMedia = window.matchMedia('(min-width: 1200px)');
+
+function positionCategoryCard(hasData) {
+  const sidebar = categorySidebarMedia.matches;
+  const target = sidebar ? el.categorySidebar : el.categoryInlineSlot;
+  if (el.categoryCard.parentElement !== target) target.appendChild(el.categoryCard);
+  el.categorySidebar.hidden = !sidebar || !hasData;
+  el.categoryInlineSlot.hidden = sidebar || !hasData;
+  el.spendingLayout.classList.toggle('has-category-sidebar', sidebar && hasData);
+}
+
+categorySidebarMedia.addEventListener('change', () => positionCategoryCard(store.transactions.length > 0));
 
 async function loadCategoryBudget() {
   if (categoryBudget.loading) return;
@@ -471,6 +487,7 @@ function render() {
   const hasData = store.transactions.length > 0;
   el.empty.hidden = hasData;
   el.results.hidden = !hasData;
+  positionCategoryCard(hasData);
   if (!hasData) return;
 
   renderKpis(txs);
