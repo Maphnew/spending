@@ -121,10 +121,19 @@ function parseBlock(block) {
   let card = '';
   let canceled = false;
   const header = text.match(RE_CARD_HEADER);
-  if (header && /카드|은행|페이|pay/i.test(header[1])) {
-    card = tidy(header[1]);
-    canceled = header[2].includes('취소');
-    text = text.replace(header[0], '\n');
+  if (header) {
+    const headerName = tidy(header[1]);
+    // "카드/은행/페이" 같은 단어가 없어도, 지출 설정에 등록해 둔 카드명이면 헤더로 인정한다
+    // (예: "현대 M 승인"만 오는 카드사도 있음)
+    const isRegisteredCard = store.cards.some((c) => {
+      const upper = c.toUpperCase();
+      return headerName.toUpperCase().includes(upper) || upper.includes(headerName.toUpperCase());
+    });
+    if (/카드|은행|페이|pay/i.test(header[1]) || isRegisteredCard) {
+      card = headerName;
+      canceled = header[2].includes('취소');
+      text = text.replace(header[0], '\n');
+    }
   }
 
   text = text.replace(RE_MASKED_NAME, ' ')      // 김*찬 / 김*찬님
@@ -424,7 +433,27 @@ let selectedCard = 'all';
 let categoryBudget = { groups: null, loading: false, error: false };
 const categorySidebarMedia = window.matchMedia('(min-width: 1200px)');
 
+const categoryFullscreen = document.getElementById('category-fullscreen');
+const categoryExpand = document.getElementById('category-expand');
+document.getElementById('category-collapse').addEventListener('click', () => categoryFullscreen.close());
+categoryExpand.addEventListener('click', () => {
+  categoryFullscreen.appendChild(el.categoryCard);
+  categoryExpand.hidden = true;
+  categoryFullscreen.showModal();
+  renderCategoryChart(visibleTransactions());
+  document.body.classList.add('category-fullscreen-open');
+  document.getElementById('category-collapse').focus();
+});
+categoryFullscreen.addEventListener('close', () => {
+  document.body.classList.remove('category-fullscreen-open');
+  categoryExpand.hidden = false;
+  renderCategoryChart(visibleTransactions());
+  positionCategoryCard(store.transactions.length > 0);
+  categoryExpand.focus({ preventScroll: true });
+});
+
 function positionCategoryCard(hasData) {
+  if (categoryFullscreen.open) return;
   const sidebar = categorySidebarMedia.matches;
   const target = sidebar ? el.categorySidebar : el.categoryInlineSlot;
   if (el.categoryCard.parentElement !== target) target.appendChild(el.categoryCard);
@@ -667,6 +696,13 @@ function renderCategoryChart(txs) {
     ? comparison.actual > comparison.budget ? `${won(comparison.actual - comparison.budget)} 초과` : `${won(comparison.budget - comparison.actual)} 남음`
     : '카드별 예산은 배분하지 않았습니다.';
   summary.append(actual, budget, remaining);el.chartCategory.append(note, summary);
+  const chartMax = Math.max(1, ...comparison.rows.map(row => Math.max(row.actual, row.budget || 0)));
+  if (categoryFullscreen.open) {
+    const legend = document.createElement('p');
+    legend.className = 'budget-chart-note';
+    legend.textContent = '분류 간 동일 눈금 · 회색: 계획 · 파랑: 실제 · 빨강: 계획 초과 · 최대 ' + won(chartMax);
+    el.chartCategory.append(legend);
+  }
   for (const row of comparison.rows) {
     const wrap=document.createElement('div');wrap.className='budget-category-row';
     const heading=document.createElement('div');heading.className='budget-category-heading';
@@ -680,7 +716,22 @@ function renderCategoryChart(txs) {
     const track=document.createElement('div');track.className='budget-category-track';track.setAttribute('role','img');track.setAttribute('aria-label',`${row.label}: ${amounts.textContent}`);
     const fill=document.createElement('div');fill.className='budget-category-fill'+(row.remaining<0?' exceeded':'');
     fill.style.width=`${row.ratio==null?0:Math.max(0,Math.min(row.ratio*100,100))}%`;
-    track.append(fill);wrap.append(heading,amounts,track);el.chartCategory.append(wrap);
+    track.append(fill);wrap.append(heading,amounts,track);
+    if (categoryFullscreen.open) {
+      track.hidden = true;
+      const chart = document.createElement('div');chart.className = 'budget-comparison';
+      for (const [name, value, kind] of [['계획', row.budget, 'plan'], ['실제', row.actual, row.remaining < 0 ? 'actual exceeded' : 'actual']]) {
+        const line = document.createElement('div');line.className = 'budget-comparison-line';
+        const caption = document.createElement('span');caption.textContent = name;
+        const lane = document.createElement('div');lane.className = 'budget-comparison-lane';lane.setAttribute('aria-hidden', 'true');
+        const bar = document.createElement('div');bar.className = 'budget-comparison-bar ' + kind;
+        bar.style.width = (Math.max(0, value || 0) / chartMax * 100) + '%';lane.append(bar);
+        const amount = document.createElement('span');amount.className = 'budget-comparison-value';amount.textContent = value == null ? '미설정' : won(value);
+        line.append(caption, lane, amount);chart.append(line);
+      }
+      wrap.append(chart);
+    }
+    el.chartCategory.append(wrap);
   }
   const foot=document.createElement('p');foot.className='budget-chart-note';
   foot.textContent=`공동 예산은 분류를 묶어 비교합니다. 실제 결제 기준이므로 적립형 항목은 결제한 달에 초과할 수 있습니다.${comparison.savings ? ` 청약 ${won(comparison.savings)}은 저축으로 별도 처리했습니다.` : ''}`;

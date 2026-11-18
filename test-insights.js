@@ -15,7 +15,7 @@ function request(port,url,method='GET'){return new Promise((resolve,reject)=>{co
 function transactions(){const db=new Database(path.join(__dirname,'spending.db'),{readonly:true});try{return db.prepare('SELECT * FROM transactions ORDER BY id').all();}finally{db.close();}}
 (async()=>{
  const before=transactions();
- const project=path.resolve(__dirname,'../codex-home/monthly-spend');
+ const project=path.join(__dirname,'monthly-spend');
  const cacheFile=path.join(root,'good-cache.json');
  const port=await start({project,cacheFile});
  const first=await request(port,'/api/insights');assert.equal(first.status,200);

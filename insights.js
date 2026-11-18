@@ -6,7 +6,7 @@ const { promisify } = require('node:util');
 const execute = promisify(execFile);
 
 module.exports = function mountInsights(app, options = {}) {
-  const project = options.project || process.env.ANALYSIS_PROJECT_DIR || path.resolve(__dirname, '../codex-home/monthly-spend');
+  const project = options.project || process.env.ANALYSIS_PROJECT_DIR || path.join(__dirname, 'monthly-spend');
   const cacheFile = options.cacheFile || path.join(__dirname, 'insights-cache.json');
   const reports = { consolidated: 'consolidated-report.json', categories: 'category-expenses.json', fixed: 'fixed-expenses.json', plan: 'spending-plan.json' };
   let current = null;

@@ -7,10 +7,18 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<dialog id="category-fullscreen" aria-labelledby="category-chart-title">
+  <button id="category-collapse" class="btn icon" type="button" aria-label="전체화면 닫기" title="닫기 (Esc)">×</button>
+</dialog>
 <div class="spending-layout" id="spending-layout">
   <aside id="category-sidebar" class="category-sidebar" aria-labelledby="category-chart-title" hidden>
     <section id="category-chart-card" class="card chart-card category-chart-card">
-      <h2 id="category-chart-title">분류별 지출</h2>
+      <div class="category-card-heading">
+        <h2 id="category-chart-title">분류별 지출</h2>
+        <button id="category-expand" class="btn icon" type="button" aria-label="분류별 지출 전체화면 보기" title="전체화면 보기" aria-haspopup="dialog" aria-controls="category-fullscreen">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg>
+        </button>
+      </div>
       <div class="category-budget-scroll" tabindex="0" role="region" aria-label="분류별 지출 스크롤 영역">
         <div id="chart-category" class="bars"></div>
       </div>

@@ -120,3 +120,7 @@ node migrate-csv.js 소비내역_전체기간.csv
 | `public/styles.css` | 스타일 (라이트/다크 자동) |
 | `public/app.js` | 파싱 · 분류 · 렌더 · 서버 API 호출 |
 | `spending.db` | 실제 데이터(SQLite). git에는 올리지 않음(`.gitignore`) |
+
+## 월별 지출 분석
+
+분석 도구는 `monthly-spend/`에 포함되어 있습니다. 사용법은 [분석 README](monthly-spend/README.md)를 참고하세요. 앱은 이 폴더의 분석 결과를 사용하며 `ANALYSIS_PROJECT_DIR`로 경로를 변경할 수 있습니다. 개인 데이터와 생성 보고서(`monthly-spend/data/`)는 Git에서 제외됩니다.

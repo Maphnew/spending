@@ -633,3 +633,31 @@ dialog.modal::backdrop {
 
 .cell-input { width: 100%; }
 .cell-input.num-input { width: 100px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Category card fullscreen view */
+.category-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; margin-bottom: 12px; }
+.category-card-heading h2 { margin: 0; }
+.category-card-heading .btn { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; min-width: 36px; min-height: 36px; }
+.category-card-heading .btn[hidden] { display: none; }
+body.category-fullscreen-open { overflow: hidden; }
+#category-fullscreen { position: fixed; inset: 0; width: 100%; max-width: none; height: 100%; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; background: var(--page); color: var(--text-primary); }
+#category-fullscreen::backdrop { background: var(--page); }
+#category-collapse { position: absolute; top: 16px; right: 16px; z-index: 1; min-width: 44px; min-height: 44px; font-size: 26px; }
+#category-fullscreen .category-chart-card { width: 100%; height: 100%; max-height: none; margin: 0; padding: 24px clamp(20px, 5vw, 80px); border: 0; border-radius: 0; }
+#category-fullscreen .category-card-heading { padding-right: 48px; min-height: 36px; }
+#category-fullscreen .category-budget-scroll { flex: 1; }
+#category-fullscreen .budget-category-heading { font-size: 15px; }
+#category-fullscreen .budget-category-amounts { font-size: 13px; }
+#category-fullscreen .budget-category-row { padding: 14px 0; }
+
+.budget-comparison { display: grid; gap: 8px; margin-top: 12px; }
+.budget-comparison-line { display: grid; grid-template-columns: 32px minmax(0, 1fr) 112px; align-items: center; gap: 12px; font-size: 13px; }
+.budget-comparison-lane { height: 18px; background: var(--hover-wash); border-radius: 3px; overflow: hidden; }
+.budget-comparison-bar { height: 100%; border-radius: 3px; }
+.budget-comparison-bar.plan { background: var(--text-muted); }
+.budget-comparison-bar.actual { background: var(--accent); }
+.budget-comparison-bar.exceeded { background: var(--critical); }
+.budget-comparison-value { text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 480px) {
+  .budget-comparison-line { grid-template-columns: 28px minmax(0, 1fr) 90px; gap: 8px; font-size: 12px; }
+}
