@@ -39,8 +39,13 @@
   <section class="card" aria-labelledby="plan-list-title">
     <div class="daily-summary">
       <h2 id="plan-list-title">소비 예정 항목</h2>
-      <span>예정 합계 <strong id="plan-total">—</strong></span>
+      <span>하루 합계 <strong id="plan-total" aria-live="polite">—</strong></span>
     </div>
+    <dl class="daily-breakdown" id="plan-breakdown" hidden>
+      <div><dt>소비 예정</dt><dd id="plan-planned"></dd></div>
+      <div><dt>결제</dt><dd id="plan-paid"></dd></div>
+      <div><dt>환불</dt><dd id="plan-refunded"></dd></div>
+    </dl>
     <p id="plan-empty" class="muted" hidden>이 날짜에 등록된 소비 계획이 없습니다.</p>
     <ul id="plan-items" class="daily-items"></ul>
   </section>

@@ -40,4 +40,14 @@ db.exec(`
   );
 `);
 
+db.transaction(() => {
+  const columns = db.pragma('table_info(daily_plans)');
+  if (!columns.some(({ name }) => name === 'status')) {
+    db.exec(`
+      ALTER TABLE daily_plans ADD COLUMN status TEXT NOT NULL DEFAULT 'planned'
+      CHECK (status IN ('planned', 'paid', 'canceled', 'on_hold', 'refunded'))
+    `);
+  }
+}).immediate();
+
 module.exports = db;

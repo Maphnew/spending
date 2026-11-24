@@ -5,9 +5,11 @@ const { randomUUID } = require('node:crypto');
 const db = require('./db');
 
 const router = express.Router();
+const statuses = new Set(['planned', 'paid', 'canceled', 'on_hold', 'refunded']);
 const list = db.prepare('SELECT * FROM daily_plans WHERE date = ? ORDER BY rowid');
-const insert = db.prepare('INSERT INTO daily_plans (id, date, name, amount) VALUES (@id, @date, @name, @amount)');
-const update = db.prepare('UPDATE daily_plans SET date = @date, name = @name, amount = @amount WHERE id = @id');
+const insert = db.prepare('INSERT INTO daily_plans (id, date, name, amount) VALUES (@id, @date, @name, @amount) RETURNING *');
+const update = db.prepare('UPDATE daily_plans SET date = @date, name = @name, amount = @amount WHERE id = @id RETURNING *');
+const updateStatus = db.prepare('UPDATE daily_plans SET status = ? WHERE id = ? RETURNING *');
 const remove = db.prepare('DELETE FROM daily_plans WHERE id = ?');
 
 function validDate(date) {
@@ -33,14 +35,22 @@ router.get('/', (req, res) => {
 
 router.post('/', readItem, (req, res) => {
   const item = { id: randomUUID(), ...req.planItem };
-  insert.run(item);
-  res.status(201).json(item);
+  res.status(201).json(insert.get(item));
 });
 
 router.put('/:id', readItem, (req, res) => {
   const item = { id: req.params.id, ...req.planItem };
-  if (!update.run(item).changes) return res.sendStatus(404);
-  res.json(item);
+  const updated = update.get(item);
+  if (!updated) return res.sendStatus(404);
+  res.json(updated);
+});
+
+router.patch('/:id/status', (req, res) => {
+  const { status } = req.body || {};
+  if (!statuses.has(status)) return res.status(400).json({ error: '상태를 확인해 주세요.' });
+  const updated = updateStatus.get(status, req.params.id);
+  if (!updated) return res.sendStatus(404);
+  res.json(updated);
 });
 
 router.delete('/:id', (req, res) => {

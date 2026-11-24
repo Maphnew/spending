@@ -11,6 +11,14 @@ const status = document.querySelector('#plan-status');
 const items = document.querySelector('#plan-items');
 const empty = document.querySelector('#plan-empty');
 const total = document.querySelector('#plan-total');
+const breakdown = document.querySelector('#plan-breakdown');
+const statuses = [
+  ['planned', '소비 예정'],
+  ['paid', '결제'],
+  ['canceled', '취소'],
+  ['on_hold', '보류'],
+  ['refunded', '환불'],
+];
 const endpoint = '/api/daily-plans';
 const won = new Intl.NumberFormat('ko-KR');
 let editingId = null;
@@ -33,7 +41,7 @@ function resetForm() {
 function setBusy(busy) {
   dateInput.disabled = busy;
   fields.disabled = busy || !dateInput.value;
-  for (const button of items.querySelectorAll('button')) button.disabled = busy;
+  for (const button of items.querySelectorAll('button, select')) button.disabled = busy;
   items.setAttribute('aria-busy', String(busy));
 }
 
@@ -56,10 +64,50 @@ function rowButton(label, item, action, danger = false) {
   return button;
 }
 
+function renderTotals(rows) {
+  const sums = { planned: 0n, paid: 0n, refunded: 0n };
+  for (const item of rows) {
+    if (Object.hasOwn(sums, item.status)) sums[item.status] += BigInt(item.amount);
+  }
+  for (const [key, value] of Object.entries(sums)) {
+    document.querySelector('#plan-' + key).textContent = won.format(value) + '원';
+  }
+  total.textContent = won.format(sums.planned + sums.paid - sums.refunded) + '원';
+  breakdown.hidden = false;
+}
+
+function statusSelect(item, rows) {
+  const select = document.createElement('select');
+  select.setAttribute('aria-label', item.name + ' 상태');
+  for (const [value, label] of statuses) select.add(new Option(label, value));
+  select.value = item.status;
+  select.addEventListener('change', async () => {
+    const nextStatus = select.value;
+    setBusy(true);
+    try {
+      const updated = await request(endpoint + '/' + item.id + '/status', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      Object.assign(item, updated);
+      renderTotals(rows);
+      showStatus('상태를 변경했습니다.');
+    } catch (error) {
+      showStatus(error.message, true);
+    } finally {
+      select.value = item.status;
+      setBusy(false);
+      select.focus();
+    }
+  });
+  return select;
+}
+
 function render(rows) {
   items.replaceChildren();
   empty.hidden = rows.length !== 0;
-  total.textContent = won.format(rows.reduce((sum, item) => sum + BigInt(item.amount), 0n)) + '원';
+  renderTotals(rows);
 
   for (const item of rows) {
     const row = document.createElement('li');
@@ -70,7 +118,7 @@ function render(rows) {
     amount.textContent = won.format(item.amount) + '원';
     const actions = document.createElement('div');
     actions.className = 'daily-row-actions';
-    actions.append(rowButton('수정', item, editItem), rowButton('삭제', item, deleteItem, true));
+    actions.append(statusSelect(item, rows), rowButton('수정', item, editItem), rowButton('삭제', item, deleteItem, true));
     row.append(name, amount, actions);
     items.append(row);
   }
@@ -80,6 +128,7 @@ async function loadDay(message = '') {
   items.replaceChildren();
   empty.hidden = true;
   total.textContent = '—';
+  breakdown.hidden = true;
   if (!dateInput.value) {
     showStatus('날짜를 선택해 주세요.');
     setBusy(false);

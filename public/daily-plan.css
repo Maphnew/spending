@@ -33,6 +33,11 @@
 #plan-status:empty { margin: 0; }
 .daily-summary { justify-content: space-between; }
 .daily-summary h2 { margin: 0; }
+.daily-breakdown { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 8px 0; font-size: .875rem; }
+.daily-breakdown div { display: flex; gap: 6px; }
+.daily-breakdown dt { color: var(--text-secondary); }
+.daily-breakdown dd { margin: 0; }
+.daily-row-actions select { font-size: .875rem; }
 .daily-items { list-style: none; margin: 0; padding: 0; }
 .daily-items li { border-top: 1px solid var(--border); padding: 10px 0; }
 .daily-items li:first-child { margin-top: 12px; }
