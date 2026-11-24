@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>하루 소비 계획 · 소비 정리</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="daily-plan.css">
+  <script defer src="daily-plan.js"></script>
+</head>
+<body>
+<main class="app daily-plan">
+  <header class="topbar">
+    <h1>하루 소비 계획</h1>
+    <a class="btn ghost" href="/">소비 정리</a>
+  </header>
+  <section class="card">
+    <div class="daily-date">
+      <label for="plan-date">계획 날짜</label>
+      <input id="plan-date" type="date" required>
+    </div>
+    <form id="plan-form">
+      <fieldset class="daily-form" disabled>
+        <div class="field">
+          <label for="plan-name">항목명</label>
+          <input id="plan-name" maxlength="120" placeholder="예: 점심 식사" required>
+        </div>
+        <div class="field">
+          <label for="plan-amount">예정 금액 (원)</label>
+          <input id="plan-amount" type="number" inputmode="numeric" min="0" max="9007199254740991" step="1" required>
+        </div>
+        <button class="btn primary" id="plan-save" type="submit">추가</button>
+        <button class="btn ghost" id="plan-cancel" type="button" hidden>수정 취소</button>
+      </fieldset>
+    </form>
+    <p id="plan-status" class="status" role="status"></p>
+  </section>
+  <section class="card" aria-labelledby="plan-list-title">
+    <div class="daily-summary">
+      <h2 id="plan-list-title">소비 예정 항목</h2>
+      <span>예정 합계 <strong id="plan-total">—</strong></span>
+    </div>
+    <p id="plan-empty" class="muted" hidden>이 날짜에 등록된 소비 계획이 없습니다.</p>
+    <ul id="plan-items" class="daily-items"></ul>
+  </section>
+</main>
+</body>
+</html>

@@ -26,6 +26,15 @@ db.exec(`
     category TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS daily_plans (
+    id     TEXT PRIMARY KEY,
+    date   TEXT NOT NULL,
+    name   TEXT NOT NULL,
+    amount INTEGER NOT NULL CHECK (amount >= 0)
+  );
+
+  CREATE INDEX IF NOT EXISTS daily_plans_date ON daily_plans (date);
+
   CREATE TABLE IF NOT EXISTS cards (
     name TEXT PRIMARY KEY
   );
